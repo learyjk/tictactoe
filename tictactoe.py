@@ -27,10 +27,10 @@ def player(board):
 
     for row in range(len(board)):
         for col in range(len(board[0])):
-            if (board[row][col] is not None):
+            if board[row][col] is not None:
                 count += 1
 
-    if (count % 2 == 0):
+    if count % 2 == 0:
         return X
     else:
         return O
@@ -144,8 +144,51 @@ def utility(board):
         return 0
 
 
+def minValue(board):
+    if terminal(board):
+        return utility(board)
+    v = float("inf")
+    for action in actions(board):
+        v = min(v, maxValue(result(board, action)))
+
+    return v
+
+
+def maxValue(board):
+    if terminal(board):
+        return utility(board)
+    v = float("-inf")
+    for action in actions(board):
+        v = max(v, minValue(result(board, action)))
+
+    return v
+
+
 def minimax(board):
     """
     Returns the optimal action for the current player on the board.
     """
-    raise NotImplementedError
+    p = player(board)
+
+    if board == initial_state():
+        return (0, 0)  # play middle square for first move.
+
+    if p == X:
+        v = float("-inf")
+        action_to_perform = None
+        for action in actions(board):
+            minValResult = minValue(result(board, action))
+            if minValResult > v:
+                v = minValResult
+                action_to_perform = action
+
+    if p == O:
+        v = float("inf")
+        action_to_perform = None
+        for action in actions(board):
+            maxValResult = maxValue(result(board, action))
+            if maxValResult < v:
+                v = maxValResult
+                action_to_perform = action
+
+    return action_to_perform
